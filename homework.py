@@ -47,11 +47,10 @@ class Calculator:
            потрачено/получено за 7 дней.
         '''
         amount = 0
-        days = 7
         today = self.now.date()
-        week = today - dt.timedelta(days)
+        week = today - dt.timedelta(days=7)
         for note in self.records:
-            if week < note.date <= today:
+            if week <= note.date <= today:
                 amount += note.amount
         return amount
 
