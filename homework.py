@@ -6,6 +6,8 @@ class Record:
        денег/килокалорий и даты
        , а также комментарии к ним.
     '''
+    DATE_FORMAT = '%d.%m.%Y'
+
     def __init__(self, amount, comment, date=None):
         self.amount = amount
         self.comment = comment
@@ -13,18 +15,17 @@ class Record:
             self.now = dt.datetime.now()
             self.date = self.now.date()
         else:
-            date_format = '%d.%m.%Y'
-            datetime = dt.datetime.strptime(date, date_format)
+            datetime = dt.datetime.strptime(date, self.DATE_FORMAT)
             self.date = datetime.date()
 
 
 class Calculator:
     ''' Подсчитывает общее кол-во денег и калорий.'''
     def __init__(self, limit):
-        '''Лимит денег/калорий.'''
         self.limit = limit
         self.records = []
-        self.now = dt.datetime.now()
+        self.today = dt.date.today()
+        self.period = dt.timedelta(days=7)
 
     def add_record(self, note):
         '''Сохраняет новую запись о
@@ -36,23 +37,22 @@ class Calculator:
         '''Cчитает сколько денег/калорий
            потрачено/съедено уже сегодня.
         '''
-        amount = 0
+        day = []
         for note in self.records:
-            if note.date == self.now.date():
-                amount += note.amount
-        return amount
+            if note.date == self.today:
+                day.append(note.amount)
+        return sum(day)
 
     def get_week_stats(self):
         '''Считает сколько денег/калорий
            потрачено/получено за 7 дней.
         '''
-        amount = 0
-        today = self.now.date()
-        week = today - dt.timedelta(days=7)
+        week = []
+        sennight = self.today - self.period
         for note in self.records:
-            if week <= note.date <= today:
-                amount += note.amount
-        return amount
+            if sennight <= note.date <= self.today:
+                week.append(note.amount)
+        return sum(week)
 
 
 class CaloriesCalculator(Calculator):
@@ -63,12 +63,9 @@ class CaloriesCalculator(Calculator):
         '''
         calories = self.limit - self.get_today_stats()
         if calories > 0:
-            msg = (f'Сегодня можно съесть что-нибудь ещё, '
-                   f'но с общей калорийностью не более {calories} кКал')
-            return msg
-        else:
-            msg = 'Хватит есть!'
-            return msg
+            return (f'Сегодня можно съесть что-нибудь ещё, '
+                    f'но с общей калорийностью не более {calories} кКал')
+        return 'Хватит есть!'
 
 
 class CashCalculator(Calculator):
@@ -84,6 +81,8 @@ class CashCalculator(Calculator):
                   'usd': 'USD',
                   'eur': 'Euro'}
         value = moneys[currency]
+        if currency not in moneys:
+            return 'Не указана валюта!'
         balance = self.limit - self.get_today_stats()
         if currency == 'rub':
             balance = round(balance, 2)
@@ -91,14 +90,11 @@ class CashCalculator(Calculator):
             balance = round(balance / self.USD_RATE, 2)
         elif currency == 'eur':
             balance = round(balance / self.EURO_RATE, 2)
-        if balance > 0:
-            msg = (f'На сегодня осталось {balance} {value}')
-            return msg
-        elif balance == 0:
-            msg = 'Денег нет, держись'
-            return msg
         else:
-            balance = abs(balance)
-            msg = (f'Денег нет, держись: твой долг - {balance} '
-                   f'{value}')
-            return msg
+            balance = 0
+        if balance == 0:
+            return 'Денег нет, держись'
+        if balance > 0:
+            return (f'На сегодня осталось {balance} {value}')
+        balance = abs(balance)
+        return (f'Денег нет, держись: твой долг - {balance} {value}')
