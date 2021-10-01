@@ -20,7 +20,7 @@ class Record:
 
 class Calculator:
     ''' Подсчитывает общее кол-во денег и калорий.'''
-    TIME_DELTA = dt.timedelta(days=7)
+    INTERVAL = dt.timedelta(days=7)
 
     def __init__(self, limit):
         self.limit = limit
@@ -31,28 +31,29 @@ class Calculator:
 
     def get_today_stats(self):
         today = dt.date.today()
-        return sum(note.amount for note in self.records if note.date == today)
+        return sum(note.amount
+                   for note in self.records
+                   if note.date == today)
 
     def get_week_stats(self):
-        week = []
         today = dt.date.today()
-        sennight = today - self.TIME_DELTA
-        for note in self.records:
-            if sennight < note.date <= today:
-                week.append(note.amount)
-        return sum(week)
+        sennight = today - self.INTERVAL
+        return sum(note.amount
+                   for note in self.records
+                   if sennight < note.date <= today)
 
 
 class CaloriesCalculator(Calculator):
     '''Подсчитывает кол-во калорий.'''
-    PHRASE = ('Сегодня можно съесть что-нибудь ещё, '
-              'но с общей калорийностью не более {key_to_insert} кКал')
+    MORE_EAT = ('Сегодня можно съесть что-нибудь ещё, '
+                'но с общей калорийностью не более {amount} кКал')
+    STOP_EAT = 'Хватит есть!'
 
     def get_calories_remained(self):
         calories = self.limit - self.get_today_stats()
         if calories > 0:
-            return self.PHRASE.format(key_to_insert=calories)
-        return 'Хватит есть!'
+            return self.MORE_EAT.format(amount=calories)
+        return self.STOP_EAT
 
 
 class CashCalculator(Calculator):
@@ -60,30 +61,32 @@ class CashCalculator(Calculator):
     USD_RATE = 60.0
     EURO_RATE = 70.0
     RUB_RATE = 1.0
-    SHORT_PHRASE = 'Денег нет, держись'
-    MIDDLE_PHRASE = 'На сегодня осталось {key_first} {key_second}'
-    LONG_PHRASE = 'Денег нет, держись: твой долг - {key_first} {key_second}'
+    OUT_CASH = 'Денег нет, держись'
+    REST_CASH = 'На сегодня осталось {amount} {forex}'
+    DEBT_CASH = 'Денег нет, держись: твой долг - {amount} {forex}'
+    STOP_ERROR = ('Несоответствующее значение. Остановлена работа '
+                  'из-за не корректного ввода денежной валюты')
     CURRENCIES = {'rub': ('руб', RUB_RATE),
                   'usd': ('USD', USD_RATE),
                   'eur': ('Euro', EURO_RATE)}
 
     def get_today_cash_remained(self, currency):
         if currency not in self.CURRENCIES:
-            raise ValueError("Несоответствующее значение")
-        currency_name, currency_rate = self.CURRENCIES[currency]
+            raise ValueError(self.STOP_ERROR)
+        name, rate = self.CURRENCIES[currency]
         balance = self.limit - self.get_today_stats()
-        balance = round(balance / currency_rate, 2)
         if balance == 0:
-            return self.SHORT_PHRASE
+            return self.OUT_CASH
+        balance = round(balance / rate, 2)
         if balance > 0:
-            return self.MIDDLE_PHRASE.format(key_first=balance,
-                                             key_second=currency_name)
-        balance = abs(balance)
-        return self.LONG_PHRASE.format(key_first=balance,
-                                       key_second=currency_name)
+            return self.REST_CASH.format(amount=balance, forex=name)
+        return self.DEBT_CASH.format(amount=abs(balance), forex=name)
 
 
-cash = CashCalculator(1000)
-cash.add_record(Record(amount=145, comment='кофе'))
-cash.add_record(Record(amount=300, comment='Серёге за обед'))
-print(cash.get_today_cash_remained('rub'))
+if __name__ == '__main__':
+    cash = CashCalculator(1000)
+    cash.add_record(Record(amount=100, comment='кофе'))
+    cash.add_record(Record(amount=200, comment='Серёге за обед'))
+    cash.add_record(Record(amount=800, comment='Казино'))
+
+    print(cash.get_today_cash_remained('rub'))
