@@ -20,7 +20,7 @@ class Record:
 
 class Calculator:
     ''' Подсчитывает общее кол-во денег и калорий.'''
-    INTERVAL = dt.timedelta(days=7)
+    WEEK_INTERVAL = dt.timedelta(days=7)
 
     def __init__(self, limit):
         self.limit = limit
@@ -37,7 +37,7 @@ class Calculator:
 
     def get_week_stats(self):
         today = dt.date.today()
-        sennight = today - self.INTERVAL
+        sennight = today - self.WEEK_INTERVAL
         return sum(note.amount
                    for note in self.records
                    if sennight < note.date <= today)
@@ -65,18 +65,19 @@ class CashCalculator(Calculator):
     REST_CASH = 'На сегодня осталось {amount} {forex}'
     DEBT_CASH = 'Денег нет, держись: твой долг - {amount} {forex}'
     STOP_ERROR = ('Несоответствующее значение. Остановлена работа '
-                  'из-за не корректного ввода денежной валюты')
+                  'из-за не корректного ввода денежной валюты. '
+                  'Введенная валюта - {forex}')
     CURRENCIES = {'rub': ('руб', RUB_RATE),
                   'usd': ('USD', USD_RATE),
                   'eur': ('Euro', EURO_RATE)}
 
     def get_today_cash_remained(self, currency):
         if currency not in self.CURRENCIES:
-            raise ValueError(self.STOP_ERROR)
-        name, rate = self.CURRENCIES[currency]
+            raise ValueError(self.STOP_ERROR.format(forex=currency))
         balance = self.limit - self.get_today_stats()
         if balance == 0:
             return self.OUT_CASH
+        name, rate = self.CURRENCIES[currency]
         balance = round(balance / rate, 2)
         if balance > 0:
             return self.REST_CASH.format(amount=balance, forex=name)
