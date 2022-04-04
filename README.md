@@ -23,5 +23,12 @@
 * Комментарий comment, поясняющий, на что потрачены деньги или откуда взялись калории.
 
 ## Установка
-1. :EMOJICODE: Клонируем репозиторий: git clone https://github.com/maksyanya/hw_python_oop.git
-- (Open a followup issue)
+1. Клонируем репозиторий: git clone https://github.com/maksyanya/hw_python_oop.git
+2. Переходим в папку с проектом: hw_python_oop/
+3. Устанавливаем виртуальное окружение для проекта: python -m venv venv
+4. Активируем виртуальное окружение: venv\Scripts\activate
+5. Устанавливаем зависимости необходимые для работы проекта: pip install -r requirements.txt
+
+## Требование
+* Python 3.7 +
+* Работает под ОС Linux, Windows, macOS
