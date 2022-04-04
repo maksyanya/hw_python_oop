@@ -29,6 +29,6 @@
 4. Активируем виртуальное окружение: venv\Scripts\activate
 5. Устанавливаем зависимости необходимые для работы проекта: pip install -r requirements.txt
 
-## Требование
+## Требования
 * Python 3.7 +
 * Работает под ОС Linux, Windows, macOS
