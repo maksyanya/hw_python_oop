@@ -36,3 +36,6 @@ r4 = Record(amount=1186,
             date='24.02.2019')
 r5 = Record(amount=84, comment='Йогурт.', date='23.02.2019')
 r6 = Record(amount=1140, comment='Баночка чипсов.', date='24.02.2019')
+
+## Установка
+
