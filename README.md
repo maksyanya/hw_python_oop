@@ -23,4 +23,5 @@
 * Комментарий comment, поясняющий, на что потрачены деньги или откуда взялись калории.
 
 ## Установка
-
+Клонируем репозиторий
+git clone https://github.com/iliazaraysky/hw_python_oop.git
