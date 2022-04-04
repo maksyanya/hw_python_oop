@@ -23,4 +23,4 @@
 * Комментарий comment, поясняющий, на что потрачены деньги или откуда взялись калории.
 
 ## Установка
-1. Клонируем репозиторий: git clone https://github.com/maksyanya/hw_python_oop.git
+1. :EMOJICODE: Клонируем репозиторий: git clone https://github.com/maksyanya/hw_python_oop.git
