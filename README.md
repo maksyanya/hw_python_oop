@@ -24,4 +24,4 @@
 
 ## Установка
 1. :EMOJICODE: Клонируем репозиторий: git clone https://github.com/maksyanya/hw_python_oop.git
- [ ] Open a followup issue
+- [GitHub Dark] Open a followup issue
