@@ -31,4 +31,4 @@
 
 ## Требования
 * Python 3.7 +
-* Работает под ОС Linux, Windows, macOS
+* Операционные системы: Linux, Windows, macOS
